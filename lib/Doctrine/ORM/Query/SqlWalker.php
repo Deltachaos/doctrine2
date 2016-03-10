@@ -1301,6 +1301,7 @@ class SqlWalker implements TreeWalker
 
                 $col = $sqlTableAlias . '.' . $columnName;
 
+                $fieldMapping = $class->getFieldMapping($fieldName);
                 $fieldType = $class->getTypeOfField($fieldName);
 
                 if (isset($class->fieldMappings[$fieldName]['requireSQLConversion'])) {
@@ -1308,7 +1309,11 @@ class SqlWalker implements TreeWalker
                     $col  = $type->convertToPHPValueSQL($col, $this->conn->getDatabasePlatform());
                 }
 
-                $sql .= $col . ' AS ' . $columnAlias;
+                $sql .= $this->conn->getDatabasePlatform()->selectAliasColumn(
+                    $col,
+                    $columnAlias,
+                    $fieldMapping
+                );
 
                 $this->scalarResultAliasMap[$resultAlias] = $columnAlias;
 
@@ -1405,7 +1410,11 @@ class SqlWalker implements TreeWalker
                         $col = $type->convertToPHPValueSQL($col, $this->platform);
                     }
 
-                    $sqlParts[] = $col . ' AS '. $columnAlias;
+                    $sqlParts[] = $this->conn->getDatabasePlatform()->selectAliasColumn(
+                        $col,
+                        $columnAlias,
+                        $mapping
+                    );
 
                     $this->scalarResultAliasMap[$resultAlias][] = $columnAlias;
 
@@ -1436,7 +1445,11 @@ class SqlWalker implements TreeWalker
                                 $col = $type->convertToPHPValueSQL($col, $this->platform);
                             }
 
-                            $sqlParts[] = $col . ' AS ' . $columnAlias;
+                            $sqlParts[] = $this->conn->getDatabasePlatform()->selectAliasColumn(
+                                $col,
+                                $columnAlias,
+                                $mapping
+                            );
 
                             $this->scalarResultAliasMap[$resultAlias][] = $columnAlias;
 
